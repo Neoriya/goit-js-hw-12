@@ -32,7 +32,7 @@ export async function showImages(userRequest, page = 1) {
         'Sorry, there are no images matching <br>your search query.Please try again!'
       ); // Генерується помилка, якщо список зображень порожній
     }
-    return response.data.hits;
+    return { images: response.data.hits, totalHits: response.data.totalHits };
   } catch (error) {
     console.error('Error fetching images:', error);
     iziToast.error({

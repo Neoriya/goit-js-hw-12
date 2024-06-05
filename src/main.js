@@ -1,3 +1,5 @@
+// Імпорт SimpleLightbox та інших залежностей
+
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
@@ -7,24 +9,23 @@ import 'izitoast/dist/css/iziToast.min.css';
 import { showImages } from './js/pixabay-api.js';
 import { createMarkup } from './js/render-functions.js';
 
+// Пошук елементів DOM
 const searchForm = document.querySelector('form');
 const searchInput = document.querySelector('input');
 const list = document.querySelector('ul');
 const loaders = document.getElementById('spinner');
 const loadMoreButton = document.getElementById('load-more');
 
-// searchInput.addEventListener('input', handleInput);
+// Додавання обробників подій
 searchForm.addEventListener('submit', handleSubmit);
 loadMoreButton.addEventListener('click', handleLoadMore);
 
 let userRequest = ''; // Змінна для запиту користувача
 let lightbox; // Змінна для SimpleLightbox
 let page = 1; // Поточна сторінка
+let totalHits = 0; // Загальна кількість результатів пошуку
 
-// function handleInput(event) {
-//   userRequest = event.target.value.trim().toLowerCase();
-// }
-
+// Функція обробки події submit
 async function handleSubmit(event) {
   event.preventDefault();
   list.innerHTML = ''; // Очищення списку перед новим пошуком
@@ -48,21 +49,23 @@ async function handleSubmit(event) {
   loaders.style.display = 'block'; // Показує спінер
 
   try {
-    const { images, totalHits } = await showImages(userRequest, page);
+    const { images, totalHits: hits } = await showImages(userRequest, page);
+    totalHits = hits; // Оновлення загальної кількості результатів пошуку
     list.innerHTML = ''; // Очищення списку перед новим пошуком
     list.insertAdjacentHTML('beforeend', createMarkup(images));
-    // list.innerHTML = createMarkup(images);
+
     if (images.length < 15 || list.children.length >= totalHits) {
       iziToast.info({
         message: "We're sorry, but you've reached the end of search results.",
         backgroundColor: '#5A5A5A',
         messageColor: '#FAFAFB',
         position: 'topRight',
-      }); // Додано повідомлення про кінець колекції
-      loadMoreButton.style.display = 'none'; // Ховати кнопку "Load more", якщо досягнуто кінець колекції
+      });
+      loadMoreButton.style.display = 'none'; // Ховає кнопку "Load more", якщо досягнуто кінець колекції
     } else {
       loadMoreButton.style.display = 'block'; // Показує кнопку "Load more", якщо ще є зображення для завантаження
     }
+
     // Ініціалізація SimpleLightbox
     if (!lightbox) {
       lightbox = new SimpleLightbox('.gallery a', {
@@ -74,33 +77,36 @@ async function handleSubmit(event) {
     } else {
       lightbox.refresh(); // Оновлення SimpleLightbox
     }
-    if (images.length === 15) {
-      loadMoreButton.style.display = 'block';
-    }
+    // if (images.length === 15) {
+    //   loadMoreButton.style.display = 'block';
+    // }
   } catch (error) {
     console.error('Error fetching images:', error);
   } finally {
     loaders.style.display = 'none'; // Приховує спінер
     searchInput.value = ''; // Очищення поля вводу
-    userRequest = ''; // Обнулення змінної userRequest
+    // userRequest = ''; // Обнулення змінної userRequest
   }
 }
 
+// Функція обробки події натискання на кнопку "Load more"
 async function handleLoadMore() {
   page += 1;
   loaders.style.display = 'block'; // Показує спінер
   try {
-    const { images, totalHits } = await showImages(userRequest, page);
+    const { images } = await showImages(userRequest, page);
     list.insertAdjacentHTML('beforeend', createMarkup(images));
     lightbox.refresh();
+
     if (images.length < 15 || list.children.length >= totalHits) {
       iziToast.info({
         message: "We're sorry, but you've reached the end of search results.",
         backgroundColor: '#5A5A5A',
         messageColor: '#FAFAFB',
         position: 'topRight',
-      }); // Додано повідомлення про кінець колекції
-      loadMoreButton.style.display = 'none'; // Ховати кнопку "Load more", якщо досягнуто кінець колекції
+      });
+
+      loadMoreButton.style.display = 'none'; // Ховає кнопку "Load more", якщо досягнуто кінець колекції
     }
   } catch (error) {
     console.error('Error fetching images:', error);
