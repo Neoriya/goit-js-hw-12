@@ -78,15 +78,11 @@ async function handleSubmit(event) {
     } else {
       lightbox.refresh(); // Оновлення SimpleLightbox
     }
-    // if (images.length === 15) {
-    //   loadMoreButton.style.display = 'block';
-    // }
   } catch (error) {
     console.error('Error fetching images:', error);
   } finally {
     loaders.style.display = 'none'; // Приховує спінер
     searchInput.value = ''; // Очищення поля вводу
-    // userRequest = ''; // Обнулення змінної userRequest
   }
 }
 
