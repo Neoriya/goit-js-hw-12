@@ -15,6 +15,7 @@ const searchInput = document.querySelector('input');
 const list = document.querySelector('ul');
 const loaders = document.getElementById('spinner');
 const loadMoreButton = document.getElementById('load-more');
+const loadMoreSpinner = document.getElementById('spinner-load-more');
 
 // Додавання обробників подій
 searchForm.addEventListener('submit', handleSubmit);
@@ -92,11 +93,20 @@ async function handleSubmit(event) {
 // Функція обробки події натискання на кнопку "Load more"
 async function handleLoadMore() {
   page += 1;
-  loaders.style.display = 'block'; // Показує спінер
+  loadMoreSpinner.style.display = 'block'; // Показує нижній спінер
   try {
     const { images } = await showImages(userRequest, page);
     list.insertAdjacentHTML('beforeend', createMarkup(images));
     lightbox.refresh();
+
+    // Отримання висоти однієї карти
+    const { height: cardHeight } =
+      list.firstElementChild.getBoundingClientRect();
+    // Прокрутка сторінки на дві висоти картки
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
 
     if (images.length < 15 || list.children.length >= totalHits) {
       iziToast.info({
@@ -111,6 +121,6 @@ async function handleLoadMore() {
   } catch (error) {
     console.error('Error fetching images:', error);
   } finally {
-    loaders.style.display = 'none'; // Приховує спінер
+    loadMoreSpinner.style.display = 'none'; // Приховує нижній спінер
   }
 }

@@ -136,6 +136,11 @@ li {
   align-items: center;
 }
 
+#load-more {
+  margin: 32px auto 32px auto;
+}
+
+/* Стилі для спінерів */
 .loader {
   width: 48px;
   height: 48px;
@@ -175,4 +180,12 @@ li {
   100% {
     transform: translate(-10px, -10px);
   }
+}
+
+#spinner-load-more {
+  margin-bottom: 44px;
+}
+
+.bottom-block {
+  height: 164px;
 }
